@@ -1,0 +1,1384 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Библиотека базовых программ</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            /* Светлая тема (по умолчанию) */
+            --primary-bg: #f8fafc;
+            --secondary-bg: #ffffff;
+            --text-color: #1e293b;
+            --text-secondary: #64748b;
+            --accent-color: #3b82f6;
+            --accent-hover: #2563eb;
+            --header-gradient: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            --card-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            --card-shadow-hover: 0 15px 35px rgba(0, 0, 0, 0.12);
+            --border-color: #e2e8f0;
+            --code-bg: #f1f5f9;
+            --modal-overlay: rgba(0, 0, 0, 0.7);
+        }
+        
+        .dark-theme {
+            /* Темная тема */
+            --primary-bg: #0f172a;
+            --secondary-bg: #1e293b;
+            --text-color: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --accent-color: #60a5fa;
+            --accent-hover: #3b82f6;
+            --header-gradient: linear-gradient(135deg, #1e293b, #0f172a);
+            --card-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            --card-shadow-hover: 0 15px 35px rgba(0, 0, 0, 0.4);
+            --border-color: #334155;
+            --code-bg: #1a2332;
+            --modal-overlay: rgba(0, 0, 0, 0.85);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        body {
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: var(--header-gradient);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(255,255,255,0.1) 100%);
+            animation: shimmer 8s infinite linear;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            animation: fadeInDown 0.8s ease;
+        }
+        
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            animation: fadeInUp 0.8s ease 0.2s both;
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            color: white;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 2;
+        }
+        
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(30deg);
+        }
+        
+        nav {
+            background-color: var(--secondary-bg);
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .dark-theme nav {
+            background-color: rgba(30, 41, 59, 0.9);
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .nav-btn {
+            background-color: var(--primary-bg);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-color);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .nav-btn:hover {
+            background-color: var(--accent-color);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.2);
+        }
+        
+        .nav-btn.active {
+            background-color: var(--accent-color);
+            color: white;
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+        }
+        
+        main {
+            padding: 2rem 0;
+        }
+        
+        .category {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .category.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .category-header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .category-header h2 {
+            font-size: 2rem;
+            color: var(--accent-color);
+            margin-bottom: 0.5rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .category-header h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: var(--accent-color);
+            border-radius: 3px;
+        }
+        
+        .category-header p {
+            color: var(--text-secondary);
+            margin-top: 1.5rem;
+        }
+        
+        .programs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+        }
+        
+        .program-card {
+            background-color: var(--secondary-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+            animation: cardAppear 0.5s ease both;
+            animation-delay: calc(var(--card-index) * 0.1s);
+        }
+        
+        @keyframes cardAppear {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .program-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--card-shadow-hover);
+        }
+        
+        .program-card-header {
+            padding: 18px;
+            background-color: var(--accent-color);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .program-card-header h3 {
+            font-size: 1.2rem;
+        }
+        
+        .program-card-body {
+            padding: 18px;
+        }
+        
+        .program-card-body p {
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+        
+        .program-card-footer {
+            padding: 15px 18px;
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--accent-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .code-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--modal-overlay);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .modal-content {
+            background-color: var(--secondary-bg);
+            width: 85%;
+            max-width: 900px;
+            border-radius: 12px;
+            overflow: hidden;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            transform: scale(0.9);
+            animation: modalAppear 0.3s ease 0.1s forwards;
+        }
+        
+        @keyframes modalAppear {
+            to {
+                transform: scale(1);
+            }
+        }
+        
+        .modal-header {
+            padding: 18px 24px;
+            background-color: var(--accent-color);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h3 {
+            font-size: 1.5rem;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.8rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.3s ease;
+        }
+        
+        .close-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .modal-body {
+            padding: 24px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        
+        pre {
+            background-color: var(--code-bg);
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            line-height: 1.5;
+            font-size: 0.95rem;
+            border: 1px solid var(--border-color);
+        }
+        
+        code {
+            color: var(--text-color);
+        }
+        
+        .modal-footer {
+            padding: 18px 24px;
+            background-color: var(--primary-bg);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        footer {
+            background-color: var(--secondary-bg);
+            color: var(--text-color);
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .language-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            background-color: rgba(255, 255, 255, 0.2);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .programs-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .nav-btn {
+                width: 90%;
+                justify-content: center;
+            }
+            
+            header h1 {
+                font-size: 2rem;
+            }
+            
+            .theme-toggle {
+                width: 45px;
+                height: 45px;
+                font-size: 1.3rem;
+                top: 15px;
+                right: 15px;
+            }
+            
+            .modal-content {
+                width: 95%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 15px;
+            }
+            
+            .program-card-footer {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body class="light-theme">
+    <header>
+        <button class="theme-toggle" id="themeToggle">
+            <i class="fas fa-moon"></i>
+        </button>
+        <div class="container header-content">
+            <h1>Библиотека базовых программ</h1>
+            <p>Коллекция простых программ на различных языках программирования</p>
+        </div>
+    </header>
+    
+    <nav>
+        <div class="container nav-container">
+            <button class="nav-btn active" data-category="python">
+                <i class="fab fa-python"></i>
+                <span>Python</span>
+            </button>
+            <button class="nav-btn" data-category="javascript">
+                <i class="fab fa-js"></i>
+                <span>JavaScript</span>
+            </button>
+            <button class="nav-btn" data-category="java">
+                <i class="fab fa-java"></i>
+                <span>Java</span>
+            </button>
+            <button class="nav-btn" data-category="cpp">
+                <i class="fas fa-copyright"></i>
+                <span>C++</span>
+            </button>
+            <button class="nav-btn" data-category="csharp">
+                <i class="fas fa-copyright"></i>
+                <span>C#</span>
+            </button>
+        </div>
+    </nav>
+    
+    <main class="container">
+        <!-- Python Category -->
+        <div class="category active" id="python">
+            <div class="category-header">
+                <h2>Программы на Python</h2>
+                <p>Простые и полезные программы на Python для начинающих</p>
+            </div>
+            
+            <div class="programs-grid">
+                <div class="program-card" style="--card-index: 0">
+                    <div class="program-card-header">
+                        <h3>Калькулятор</h3>
+                        <span class="language-badge">Python</span>
+                    </div>
+                    <div class="program-card-body">
+                        <p>Простой калькулятор с базовыми арифметическими операциями, реализованный на Python с использованием функций.</p>
+                    </div>
+                    <div class="program-card-footer">
+                        <button class="btn btn-outline view-code" data-program="python-calc">
+                            <i class="fas fa-code"></i>
+                            <span>Просмотреть код</span>
+                        </button>
+                        <button class="btn btn-primary download-code" data-program="python-calc">
+                            <i class="fas fa-download"></i>
+                            <span>Скачать</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="program-card" style="--card-index: 1">
+                    <div class="program-card-header">
+                        <h3>Угадай число</h3>
+                        <span class="language-badge">Python</span>
+                    </div>
+                    <div class="program-card-body">
+                        <p>Игра, в которой компьютер загадывает число, а пользователь пытается его угадать за ограниченное число попыток.</p>
+                    </div>
+                    <div class="program-card-footer">
+                        <button class="btn btn-outline view-code" data-program="python-guess">
+                            <i class="fas fa-code"></i>
+                            <span>Просмотреть код</span>
+                        </button>
+                        <button class="btn btn-primary download-code" data-program="python-guess">
+                            <i class="fas fa-download"></i>
+                            <span>Скачать</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="program-card" style="--card-index: 2">
+                    <div class="program-card-header">
+                        <h3>Список задач</h3>
+                        <span class="language-badge">Python</span>
+                    </div>
+                    <div class="program-card-body">
+                        <p>Консольное приложение для управления списком задач с возможностью добавления, удаления и просмотра задач.</p>
+                    </div>
+                    <div class="program-card-footer">
+                        <button class="btn btn-outline view-code" data-program="python-todo">
+                            <i class="fas fa-code"></i>
+                            <span>Просмотреть код</span>
+                        </button>
+                        <button class="btn btn-primary download-code" data-program="python-todo">
+                            <i class="fas fa-download"></i>
+                            <span>Скачать</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- JavaScript Category -->
+        <div class="category" id="javascript">
+            <div class="category-header">
+                <h2>Программы на JavaScript</h2>
+                <p>Примеры программ на JavaScript для веб-разработки</p>
+            </div>
+            
+            <div class="programs-grid">
+                <div class="program-card" style="--card-index: 0">
+                    <div class="program-card-header">
+                        <h3>Таймер обратного отсчета</h3>
+                        <span class="language-badge">JavaScript</span>
+                    </div>
+                    <div class="program-card-body">
+                        <p>Таймер обратного отсчета, который показывает оставшееся время до заданной даты или события.</p>
+                    </div>
+                    <div class="program-card-footer">
+                        <button class="btn btn-outline view-code" data-program="js-timer">
+                            <i class="fas fa-code"></i>
+                            <span>Просмотреть код</span>
+                        </button>
+                        <button class="btn btn-primary download-code" data-program="js-timer">
+                            <i class="fas fa-download"></i>
+                            <span>Скачать</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="program-card" style="--card-index: 1">
+                    <div class="program-card-header">
+                        <h3>Валидация формы</h3>
+                        <span class="language-badge">JavaScript</span>
+                    </div>
+                    <div class="program-card-body">
+                        <p>Скрипт для проверки корректности ввода данных в HTML-форму перед отправкой на сервер.</p>
+                    </div>
+                    <div class="program-card-footer">
+                        <button class="btn btn-outline view-code" data-program="js-form">
+                            <i class="fas fa-code"></i>
+                            <span>Просмотреть код</span>
+                        </button>
+                        <button class="btn btn-primary download-code" data-program="js-form">
+                            <i class="fas fa-download"></i>
+                            <span>Скачать</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Java Category -->
+        <div class="category" id="java">
+            <div class="category-header">
+                <h2>Программы на Java</h2>
+                <p>Базовые программы на Java для изучения основ языка</p>
+            </div>
+            
+            <div class="programs-grid">
+                <div class="program-card" style="--card-index: 0">
+                    <div class="program-card-header">
+                        <h3>Hello World</h3>
+                        <span class="language-badge">Java</span>
+                    </div>
+                    <div class="program-card-body">
+                        <p>Классическая программа "Hello World" на Java, которая выводит приветствие в консоль.</p>
+                    </div>
+                    <div class="program-card-footer">
+                        <button class="btn btn-outline view-code" data-program="java-hello">
+                            <i class="fas fa-code"></i>
+                            <span>Просмотреть код</span>
+                        </button>
+                        <button class="btn btn-primary download-code" data-program="java-hello">
+                            <i class="fas fa-download"></i>
+                            <span>Скачать</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="program-card" style="--card-index: 1">
+                    <div class="program-card-header">
+                        <h3>Калькулятор</h3>
+                        <span class="language-badge">Java</span>
+                    </div>
+                    <div class="program-card-body">
+                        <p>Простой калькулятор с графическим интерфейсом, реализованный на Java с использованием Swing.</p>
+                    </div>
+                    <div class="program-card-footer">
+                        <button class="btn btn-outline view-code" data-program="java-calc">
+                            <i class="fas fa-code"></i>
+                            <span>Просмотреть код</span>
+                        </button>
+                        <button class="btn btn-primary download-code" data-program="java-calc">
+                            <i class="fas fa-download"></i>
+                            <span>Скачать</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- C++ Category -->
+        <div class="category" id="cpp">
+            <div class="category-header">
+                <h2>Программы на C++</h2>
+                <p>Примеры программ на C++ для начинающих разработчиков</p>
+            </div>
+            
+            <div class="programs-grid">
+                <div class="program-card" style="--card-index: 0">
+                    <div class="program-card-header">
+                        <h3>Hello World</h3>
+                        <span class="language-badge">C++</span>
+                    </div>
+                    <div class="program-card-body">
+                        <p>Базовая программа "Hello World" на C++, которая демонстрирует основные конструкции языка.</p>
+                    </div>
+                    <div class="program-card-footer">
+                        <button class="btn btn-outline view-code" data-program="cpp-hello">
+                            <i class="fas fa-code"></i>
+                            <span>Просмотреть код</span>
+                        </button>
+                        <button class="btn btn-primary download-code" data-program="cpp-hello">
+                            <i class="fas fa-download"></i>
+                            <span>Скачать</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="program-card" style="--card-index: 1">
+                    <div class="program-card-header">
+                        <h3>Калькулятор</h3>
+                        <span class="language-badge">C++</span>
+                    </div>
+                    <div class="program-card-body">
+                        <p>Консольный калькулятор на C++ с поддержкой основных арифметических операций.</p>
+                    </div>
+                    <div class="program-card-footer">
+                        <button class="btn btn-outline view-code" data-program="cpp-calc">
+                            <i class="fas fa-code"></i>
+                            <span>Просмотреть код</span>
+                        </button>
+                        <button class="btn btn-primary download-code" data-program="cpp-calc">
+                            <i class="fas fa-download"></i>
+                            <span>Скачать</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- C# Category -->
+        <div class="category" id="csharp">
+            <div class="category-header">
+                <h2>Программы на C#</h2>
+                <p>Простые программы на C# для изучения платформы .NET</p>
+            </div>
+            
+            <div class="programs-grid">
+                <div class="program-card" style="--card-index: 0">
+                    <div class="program-card-header">
+                        <h3>Hello World</h3>
+                        <span class="language-badge">C#</span>
+                    </div>
+                    <div class="program-card-body">
+                        <p>Базовая программа "Hello World" на C#, демонстрирующая основы синтаксиса языка.</p>
+                    </div>
+                    <div class="program-card-footer">
+                        <button class="btn btn-outline view-code" data-program="cs-hello">
+                            <i class="fas fa-code"></i>
+                            <span>Просмотреть код</span>
+                        </button>
+                        <button class="btn btn-primary download-code" data-program="cs-hello">
+                            <i class="fas fa-download"></i>
+                            <span>Скачать</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="program-card" style="--card-index: 1">
+                    <div class="program-card-header">
+                        <h3>Простой редактор текста</h3>
+                        <span class="language-badge">C#</span>
+                    </div>
+                    <div class="program-card-body">
+                        <p>Простой текстовый редактор с базовыми функциями, созданный на C# с использованием Windows Forms.</p>
+                    </div>
+                    <div class="program-card-footer">
+                        <button class="btn btn-outline view-code" data-program="cs-editor">
+                            <i class="fas fa-code"></i>
+                            <span>Просмотреть код</span>
+                        </button>
+                        <button class="btn btn-primary download-code" data-program="cs-editor">
+                            <i class="fas fa-download"></i>
+                            <span>Скачать</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Модальное окно для просмотра кода -->
+    <div class="code-modal" id="codeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Название программы</h3>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <pre><code id="codeContent">// Код программы будет здесь</code></pre>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="copyCode">
+                    <i class="far fa-copy"></i>
+                    <span>Копировать код</span>
+                </button>
+                <button class="btn btn-primary" id="closeModal">
+                    <i class="fas fa-times"></i>
+                    <span>Закрыть</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <p>Библиотека базовых программ &copy; 2023</p>
+                <p>Все программы представлены в учебных целях</p>
+                <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                    <i class="fas fa-palette"></i> Текущая тема: <span id="currentTheme">Светлая</span>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Данные с кодом программ
+        const programCodes = {
+            'python-calc': `# Простой калькулятор на Python
+def add(x, y):
+    return x + y
+
+def subtract(x, y):
+    return x - y
+
+def multiply(x, y):
+    return x * y
+
+def divide(x, y):
+    if y == 0:
+        return "Ошибка! Деление на ноль."
+    return x / y
+
+print("Выберите операцию:")
+print("1. Сложение")
+print("2. Вычитание")
+print("3. Умножение")
+print("4. Деление")
+
+choice = input("Введите номер операции (1/2/3/4): ")
+
+num1 = float(input("Введите первое число: "))
+num2 = float(input("Введите второе число: "))
+
+if choice == '1':
+    print(f"{num1} + {num2} = {add(num1, num2)}")
+elif choice == '2':
+    print(f"{num1} - {num2} = {subtract(num1, num2)}")
+elif choice == '3':
+    print(f"{num1} * {num2} = {multiply(num1, num2)}")
+elif choice == '4':
+    print(f"{num1} / {num2} = {divide(num1, num2)}")
+else:
+    print("Неверный ввод")`,
+            
+            'python-guess': `# Игра "Угадай число"
+import random
+
+def guess_number():
+    number = random.randint(1, 100)
+    attempts = 0
+    max_attempts = 7
+    
+    print("Я загадал число от 1 до 100. Попробуй угадать!")
+    print(f"У тебя есть {max_attempts} попыток.")
+    
+    while attempts < max_attempts:
+        try:
+            guess = int(input("Введи свою догадку: "))
+        except ValueError:
+            print("Пожалуйста, введи число!")
+            continue
+            
+        attempts += 1
+        
+        if guess < number:
+            print("Загаданное число больше.")
+        elif guess > number:
+            print("Загаданное число меньше.")
+        else:
+            print(f"Поздравляю! Ты угадал число за {attempts} попыток.")
+            return
+    
+    print(f"К сожалению, попытки закончились. Загаданное число было: {number}")
+
+if __name__ == "__main__":
+    guess_number()`,
+            
+            'python-todo': `# Простой список задач
+tasks = []
+
+def show_tasks():
+    if not tasks:
+        print("Список задач пуст.")
+    else:
+        print("Твои задачи:")
+        for i, task in enumerate(tasks, 1):
+            print(f"{i}. {task}")
+
+def add_task():
+    task = input("Введите новую задачу: ")
+    tasks.append(task)
+    print("Задача добавлена!")
+
+def remove_task():
+    show_tasks()
+    if tasks:
+        try:
+            index = int(input("Введите номер задачи для удаления: ")) - 1
+            if 0 <= index < len(tasks):
+                removed = tasks.pop(index)
+                print(f"Задача '{removed}' удалена!")
+            else:
+                print("Неверный номер задачи.")
+        except ValueError:
+            print("Пожалуйста, введите число!")
+
+def main():
+    while True:
+        print("\\n--- Менеджера задач ---")
+        print("1. Показать задачи")
+        print("2. Добавить задачу")
+        print("3. Удалить задачу")
+        print("4. Выйти")
+        
+        choice = input("Выберите действие (1-4): ")
+        
+        if choice == '1':
+            show_tasks()
+        elif choice == '2':
+            add_task()
+        elif choice == '3':
+            remove_task()
+        elif choice == '4':
+            print("До свидания!")
+            break
+        else:
+            print("Неверный выбор. Попробуйте снова.")
+
+if __name__ == "__main__":
+    main()`,
+            
+            'js-timer': `// Таймер обратного отсчета на JavaScript
+function startTimer(duration, display) {
+    let timer = duration, hours, minutes, seconds;
+    setInterval(function () {
+        hours = parseInt(timer / 3600, 10);
+        minutes = parseInt((timer % 3600) / 60, 10);
+        seconds = parseInt(timer % 60, 10);
+        
+        hours = hours < 10 ? "0" + hours : hours;
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+        
+        display.textContent = hours + ":" + minutes + ":" + seconds;
+        
+        if (--timer < 0) {
+            timer = duration;
+        }
+    }, 1000);
+}
+
+window.onload = function () {
+    const fiveMinutes = 60 * 5;
+    const display = document.querySelector('#timer');
+    startTimer(fiveMinutes, display);
+};`,
+            
+            'js-form': `// Валидация формы на JavaScript
+function validateForm() {
+    const name = document.forms["myForm"]["name"].value;
+    const email = document.forms["myForm"]["email"].value;
+    const phone = document.forms["myForm"]["phone"].value;
+    
+    if (name == "") {
+        alert("Пожалуйста, введите ваше имя");
+        return false;
+    }
+    
+    if (email == "") {
+        alert("Пожалуйста, введите ваш email");
+        return false;
+    } else if (!validateEmail(email)) {
+        alert("Пожалуйста, введите корректный email");
+        return false;
+    }
+    
+    if (phone != "" && !validatePhone(phone)) {
+        alert("Пожалуйста, введите корректный номер телефона");
+        return false;
+    }
+    
+    return true;
+}
+
+function validateEmail(email) {
+    const re = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+    return re.test(email);
+}
+
+function validatePhone(phone) {
+    const re = /^[\\+]?[0-9\\-\\(\\)\\s]{10,}$/;
+    return re.test(phone);
+}`,
+            
+            'java-hello': `// Классическая программа Hello World на Java
+public class HelloWorld {
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+    }
+}`,
+            
+            'java-calc': `// Простой калькулятор на Java с использованием Swing
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class SimpleCalculator {
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("Калькулятор");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(300, 400);
+        
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(4, 4, 5, 5));
+        
+        JTextField display = new JTextField();
+        display.setEditable(false);
+        frame.add(display, BorderLayout.NORTH);
+        
+        String[] buttons = {
+            "7", "8", "9", "/",
+            "4", "5", "6", "*",
+            "1", "2", "3", "-",
+            "0", ".", "=", "+"
+        };
+        
+        for (String text : buttons) {
+            JButton button = new JButton(text);
+            panel.add(button);
+        }
+        
+        frame.add(panel);
+        frame.setVisible(true);
+    }
+}`,
+            
+            'cpp-hello': `// Программа Hello World на C++
+#include <iostream>
+
+int main() {
+    std::cout << "Hello, World!" << std::endl;
+    return 0;
+}`,
+            
+            'cpp-calc': `// Простой калькулятор на C++
+#include <iostream>
+using namespace std;
+
+int main() {
+    char op;
+    double num1, num2;
+    
+    cout << "Введите оператор (+, -, *, /): ";
+    cin >> op;
+    
+    cout << "Введите два числа: ";
+    cin >> num1 >> num2;
+    
+    switch(op) {
+        case '+':
+            cout << num1 << " + " << num2 << " = " << num1 + num2;
+            break;
+        case '-':
+            cout << num1 << " - " << num2 << " = " << num1 - num2;
+            break;
+        case '*':
+            cout << num1 << " * " << num2 << " = " << num1 * num2;
+            break;
+        case '/':
+            if (num2 != 0)
+                cout << num1 << " / " << num2 << " = " << num1 / num2;
+            else
+                cout << "Ошибка! Деление на ноль.";
+            break;
+        default:
+            cout << "Ошибка! Неверный оператор.";
+    }
+    
+    return 0;
+}`,
+            
+            'cs-hello': `// Программа Hello World на C#
+using System;
+
+class HelloWorld
+{
+    static void Main()
+    {
+        Console.WriteLine("Hello, World!");
+    }
+}`,
+            
+            'cs-editor': `// Простой текстовый редактор на C# с Windows Forms
+using System;
+using System.Windows.Forms;
+using System.IO;
+
+namespace SimpleTextEditor
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+        }
+        
+        private void newToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            richTextBox1.Clear();
+        }
+        
+        private void openToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog open = new OpenFileDialog();
+            if (open.ShowDialog() == DialogResult.OK)
+            {
+                richTextBox1.Text = File.ReadAllText(open.FileName);
+            }
+        }
+        
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog save = new SaveFileDialog();
+            save.Filter = "Text File|*.txt";
+            if (save.ShowDialog() == DialogResult.OK)
+            {
+                File.WriteAllText(save.FileName, richTextBox1.Text);
+            }
+        }
+        
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+    }
+}`
+        };
+
+        // Функционал сайта
+        document.addEventListener('DOMContentLoaded', function() {
+            // Инициализация темы
+            const themeToggle = document.getElementById('themeToggle');
+            const currentThemeSpan = document.getElementById('currentTheme');
+            const body = document.body;
+            
+            // Проверяем сохраненную тему или системные настройки
+            const savedTheme = localStorage.getItem('theme');
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+                enableDarkTheme();
+            } else {
+                enableLightTheme();
+            }
+            
+            // Переключение темы
+            themeToggle.addEventListener('click', function() {
+                if (body.classList.contains('dark-theme')) {
+                    enableLightTheme();
+                } else {
+                    enableDarkTheme();
+                }
+            });
+            
+            function enableDarkTheme() {
+                body.classList.remove('light-theme');
+                body.classList.add('dark-theme');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                currentThemeSpan.textContent = 'Тёмная';
+                localStorage.setItem('theme', 'dark');
+            }
+            
+            function enableLightTheme() {
+                body.classList.remove('dark-theme');
+                body.classList.add('light-theme');
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                currentThemeSpan.textContent = 'Светлая';
+                localStorage.setItem('theme', 'light');
+            }
+            
+            // Переключение между категориями
+            const navButtons = document.querySelectorAll('.nav-btn');
+            const categories = document.querySelectorAll('.category');
+            
+            navButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const categoryId = this.getAttribute('data-category');
+                    
+                    // Анимация переключения
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 200);
+                    
+                    // Активируем выбранную кнопку
+                    navButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Показываем выбранную категорию
+                    categories.forEach(cat => {
+                        cat.classList.remove('active');
+                        if (cat.id === categoryId) {
+                            setTimeout(() => {
+                                cat.classList.add('active');
+                            }, 50);
+                        }
+                    });
+                });
+            });
+            
+            // Модальное окно для просмотра кода
+            const modal = document.getElementById('codeModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const codeContent = document.getElementById('codeContent');
+            const viewCodeButtons = document.querySelectorAll('.view-code');
+            const closeModalBtn = document.getElementById('closeModal');
+            const copyCodeBtn = document.getElementById('copyCode');
+            const closeBtn = document.querySelector('.close-btn');
+            
+            viewCodeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const programId = this.getAttribute('data-program');
+                    const programName = this.closest('.program-card').querySelector('h3').textContent;
+                    
+                    modalTitle.textContent = programName;
+                    codeContent.textContent = programCodes[programId];
+                    modal.style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                });
+            });
+            
+            function closeModal() {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+            
+            closeModalBtn.addEventListener('click', closeModal);
+            closeBtn.addEventListener('click', closeModal);
+            
+            // Закрытие модального окна при клике вне его области
+            window.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+            
+            // Закрытие модального окна по Esc
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape' && modal.style.display === 'flex') {
+                    closeModal();
+                }
+            });
+            
+            // Копирование кода в буфер обмена
+            copyCodeBtn.addEventListener('click', function() {
+                const tempTextArea = document.createElement('textarea');
+                tempTextArea.value = codeContent.textContent;
+                document.body.appendChild(tempTextArea);
+                tempTextArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempTextArea);
+                
+                // Анимация успешного копирования
+                const originalText = copyCodeBtn.innerHTML;
+                copyCodeBtn.innerHTML = '<i class="fas fa-check"></i><span>Скопировано!</span>';
+                copyCodeBtn.style.backgroundColor = '#10b981';
+                copyCodeBtn.style.borderColor = '#10b981';
+                
+                setTimeout(() => {
+                    copyCodeBtn.innerHTML = originalText;
+                    copyCodeBtn.style.backgroundColor = '';
+                    copyCodeBtn.style.borderColor = '';
+                }, 2000);
+            });
+            
+            // Функция "скачивания" кода
+            const downloadButtons = document.querySelectorAll('.download-code');
+            
+            downloadButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const programId = this.getAttribute('data-program');
+                    const programName = this.closest('.program-card').querySelector('h3').textContent;
+                    const code = programCodes[programId];
+                    
+                    // Анимация кнопки
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 200);
+                    
+                    // Создаем виртуальную ссылку для скачивания
+                    const blob = new Blob([code], { type: 'text/plain' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    
+                    // Определяем расширение файла в зависимости от языка
+                    let extension = '.txt';
+                    if (programId.includes('python')) extension = '.py';
+                    else if (programId.includes('js')) extension = '.js';
+                    else if (programId.includes('java')) extension = '.java';
+                    else if (programId.includes('cpp')) extension = '.cpp';
+                    else if (programId.includes('cs')) extension = '.cs';
+                    
+                    a.href = url;
+                    a.download = `${programName}${extension}`;
+                    document.body.appendChild(a);
+                    a.click();
+                    
+                    // Очищаем память
+                    setTimeout(function() {
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                    }, 100);
+                });
+            });
+            
+            // Анимация при загрузке страницы
+            setTimeout(() => {
+                document.body.style.opacity = 1;
+            }, 100);
+        });
+    </script>
+</body>
+</html>
